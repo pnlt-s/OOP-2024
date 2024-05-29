@@ -67,7 +67,7 @@ class Ball:
         if (self.pos_y - self.radius <= 0 or
                 self.pos_y + self.radius >= WINDOW_HEIGHT):
             self.vec_y = -self.vec_y
-        if (self.pos_x - self.radius <= 0 or 
+        if (self.pos_x - self.radius <= 0 or
                 self.pos_x + self.radius >= WINDOW_WIDTH):
             self.vec_x = -self.vec_x
 

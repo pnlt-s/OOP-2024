@@ -68,6 +68,7 @@ class GameColors():
     white = Color(255, 255, 255)
     gray = Color.from_hex(0x7D7D7D)
     light_gray = Color.from_hex(0xADADAD)
+    dark_gray = Color.from_hex(0x1F1F1F)
 
     def __init__(self):
         # Сначала создаём список, который будет находится внутри класса
@@ -443,12 +444,15 @@ class Gun:
         pass
 
     def draw(self):
+        draw_color = self.color
+        if not self.active:
+            draw_color = colors.dark_gray.value()
         pygame.draw.circle(
             self.screen,
-            self.color if self.active else colors.light_gray.value(),
+            draw_color,
             (
-                self.x,
-                self.y
+                max(0, min(GameSettings.SCREEN_SIZE[0], self.x)),
+                max(0, min(GameSettings.SCREEN_SIZE[1],  self.y))
             ),
             10
         )
@@ -462,7 +466,10 @@ class Gun:
         pygame.draw.line(
             self.screen,
             self.color,
-            (self.x, self.y),
+            (
+                max(0, min(GameSettings.SCREEN_SIZE[0], self.x)),
+                max(0, min(GameSettings.SCREEN_SIZE[1], self.y))
+            ),
             (self.x + direction[0], self.y + direction[1]),
             5
         )
@@ -770,12 +777,11 @@ while not finished:
     if len(state.targets) > 0:
         # Выключаем и рисуем все пушки
         for gun in state.guns:
-            gun.active = False
+            gun.active = gun == state.active_gun
             gun.draw()
 
         # Включаем "активную" пушку
         gun = state.active_gun
-        gun.active = True
 
         # Выводим количество оставшихся целей
         text = font.render(
@@ -839,7 +845,9 @@ while not finished:
         # Для переключения между пушками проверяем, попал ли шарик в пушку
         for gun_test in state.guns:
             gun_test.move()
+            gun_test.active = False
             if gun_test == state.active_gun:
+                gun_test.active = True
                 continue
             htest = state.balls.hittest(gun_test)
             if htest is not None:
